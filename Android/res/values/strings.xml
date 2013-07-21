@@ -11,7 +11,11 @@
     <string name="cp_info_text">Resize/Orient Image to Fit Face Inside the Orange Circle</string>
     <string name="cp_image_contentDesc">Image</string>
     <string name="cp_template_contentDesc">Template</string>
+    <string name="cp_change_img_contentDesc">Change Image</string>
     <string name="cp_crop_button">Crop Image</string>
     <string name="cp_template_button">Change Template</string>
+    
+    <!-- Media Select Dialog -->
+    <string name="msd_select_media_text">Select Media</string>
     
 </resources>

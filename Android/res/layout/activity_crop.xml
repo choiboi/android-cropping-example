@@ -53,5 +53,14 @@
             android:text="@string/cp_crop_button"
             style="?android:attr/buttonBarButtonStyle" 
             android:onClick="onCropImageButton"/>
+
+        <ImageButton
+            android:id="@+id/imageButton1"
+            android:contentDescription="@string/cp_change_img_contentDesc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:src="@android:drawable/ic_menu_gallery" 
+            android:onClick="onChangeImageButton"/>
     </LinearLayout>
 </LinearLayout>

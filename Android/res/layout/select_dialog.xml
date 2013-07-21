@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+    
+    <TextView
+        android:id="@+id/select_title_text"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="#666"
+        android:textColor="#fff"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
+    <ListView
+        android:id="@+id/select_list"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:stackFromBottom="true"
+        android:divider="#3f3f3f" 
+        android:dividerHeight="1dp"/>
+</LinearLayout>
