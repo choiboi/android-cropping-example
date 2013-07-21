@@ -28,6 +28,7 @@
             android:contentDescription="@string/cp_template_contentDesc"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
+            android:src="@drawable/face_oval" 
             android:scaleType="centerInside" />
     </FrameLayout>
     
