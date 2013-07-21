@@ -2,7 +2,16 @@
 <resources>
 
     <string name="app_name">Image Cropping Example</string>
-    <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
-
+    
+    <!-- Main Page -->
+    <string name="ma_start_crop_button">Start Crop Image</string>
+    <string name="ma_info_text">Click on button below to start cropping image.</string>
+    
+    <!-- Crop Page -->
+    <string name="cp_info_text">Resize/Orient Image to Fit Face Inside the Orange Circle</string>
+    <string name="cp_image_contentDesc">Image</string>
+    <string name="cp_template_contentDesc">Template</string>
+    <string name="cp_crop_button">Crop Image</string>
+    <string name="cp_template_button">Change Template</string>
+    
 </resources>
