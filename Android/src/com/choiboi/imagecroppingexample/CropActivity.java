@@ -4,15 +4,26 @@ import java.io.File;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.DisplayMetrics;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 public class CropActivity extends Activity {
     
+    private ImageView mImg;
+    private ImageView mTemplateImg;
+    private int mScreenWidth;
+    private int mScreenHeight;
+    
+    // Constants
     private final String TEMP_JPEG_FILENAME = "img_temp.jpg";
     private final String APP_NAME = "ImageCropExample";
     private final String STORAGE_MISSING_MSG = "Your Phone is Currently Not Connected to Any Storage Device!";
@@ -21,11 +32,23 @@ public class CropActivity extends Activity {
     public static final int MEDIA_SELECT_DIALOG = 0;
     public static final int MEDIA_CAMERA = 1;
     public static final int MEDIA_GALLERY = 2;
+    
+    private final static int IMG_MAX_SIZE = 1000;
+    private final static int IMG_MAX_SIZE_MDPI = 400;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_crop);
+        
+        mImg = (ImageView) findViewById(R.id.cp_img);
+        mTemplateImg = (ImageView) findViewById(R.id.cp_face_template);
+        
+        // Get screen size in pixels.
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        mScreenHeight = metrics.heightPixels;
+        mScreenWidth = metrics.widthPixels;
     }
     
     public void onCropImageButton(View v) {
@@ -39,6 +62,23 @@ public class CropActivity extends Activity {
     public void onChangeImageButton(View v) {
         Intent intent = new Intent(this, MediaSelectDialog.class);
         startActivityForResult(intent, MEDIA_SELECT_DIALOG);
+    }
+    
+    /*
+     * Adjust the size of bitmap before loading it to memory.
+     */
+    private void setSelectedImage(String path) {
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(path, options);
+        if (mScreenWidth == 320 && mScreenHeight == 480) {
+            options.inSampleSize = calculateImageSize(options, IMG_MAX_SIZE_MDPI);
+        } else {
+            options.inSampleSize = calculateImageSize(options, IMG_MAX_SIZE);
+        }
+        options.inJustDecodeBounds = false;
+        Bitmap photoImg = BitmapFactory.decodeFile(path, options);
+        mImg.setImageBitmap(photoImg);
     }
     
     private File getOutputMediaFile(String filename) {
@@ -61,6 +101,38 @@ public class CropActivity extends Activity {
             directory = mediaStorageDir.getPath() + File.separator + filename;
         }
         return directory;
+    }
+    
+    private String getGalleryImagePath(Intent data) {
+        Uri imgUri = data.getData();
+        String filePath = "";
+        if (data.getType() == null) {
+            // For getting images from gallery.
+            String[] filePathColumn = { MediaStore.Images.Media.DATA };
+            Cursor cursor = getContentResolver().query(imgUri, filePathColumn, null, null, null);
+            cursor.moveToFirst();
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            filePath = cursor.getString(columnIndex);
+            cursor.close();
+        } else if (data.getType().equals("image/jpeg") || data.getType().equals("image/png")) {
+            // For getting images from dropbox.
+            filePath = imgUri.getPath();
+        }
+        return filePath;
+    }
+    
+    private int calculateImageSize(BitmapFactory.Options opts, int threshold) {
+        int scaleFactor = 1;
+        final int height = opts.outHeight;
+        final int width = opts.outWidth;
+
+        if (width >= height) {
+            scaleFactor = Math.round((float) width / threshold);
+        } else {
+            scaleFactor = Math.round((float) height / threshold);
+        }
+
+        return scaleFactor;
     }
 
     @Override
@@ -88,9 +160,11 @@ public class CropActivity extends Activity {
                     startActivityForResult(intent , MEDIA_GALLERY);
                 }
             } else if (requestCode == MEDIA_CAMERA) {
-                
+                String path = getOutputLink(TEMP_JPEG_FILENAME);
+                setSelectedImage(path);
             } else if (requestCode == MEDIA_GALLERY) {
-                
+                String path = getGalleryImagePath(data);
+                setSelectedImage(path);
             }
         }
     }
