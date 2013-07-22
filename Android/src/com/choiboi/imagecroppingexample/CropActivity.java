@@ -1,7 +1,5 @@
 package com.choiboi.imagecroppingexample;
 
-import java.io.File;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
@@ -11,15 +9,14 @@ import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.choiboi.imagecroppingexample.gestures.MoveGestureDetector;
 import com.choiboi.imagecroppingexample.gestures.RotateGestureDetector;
@@ -42,14 +39,7 @@ public class CropActivity extends Activity implements OnTouchListener {
     private MoveGestureDetector mMoveDetector;
     
     // Constants
-    private final String TEMP_JPEG_FILENAME = "img_temp.jpg";
-    private final String APP_NAME = "ImageCropExample";
-    private final String STORAGE_MISSING_MSG = "Your Phone is Currently Not Connected to Any Storage Device!";
-    public static final String SELECTED_MEDIA = "SELECTED_MEDIA";
-    
-    public static final int MEDIA_SELECT_DIALOG = 0;
-    public static final int MEDIA_CAMERA = 1;
-    public static final int MEDIA_GALLERY = 2;
+    public static final int MEDIA_GALLERY = 1;
     
     private final static int IMG_MAX_SIZE = 1000;
     private final static int IMG_MAX_SIZE_MDPI = 400;
@@ -76,6 +66,7 @@ public class CropActivity extends Activity implements OnTouchListener {
             mTemplateImg.setImageBitmap(faceTemplate);
         }
         
+        // Load temp image.
         Bitmap photoImg = BitmapFactory.decodeResource(getResources(), R.drawable.temp_image);
         mImg.setImageBitmap(photoImg);
         mImageHeight = photoImg.getHeight();
@@ -100,51 +91,37 @@ public class CropActivity extends Activity implements OnTouchListener {
     }
     
     public void onChangeImageButton(View v) {
-        Intent intent = new Intent(this, MediaSelectDialog.class);
-        startActivityForResult(intent, MEDIA_SELECT_DIALOG);
+        // Start Gallery App.
+        Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(intent, MEDIA_GALLERY);
     }
     
     /*
      * Adjust the size of bitmap before loading it to memory.
+     * This will help the phone by not taking up a lot memory.
      */
     private void setSelectedImage(String path) {
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(path, options);
+        Log.d("Example", "After resize: " + options.outWidth + " " + options.outHeight);
         if (mScreenWidth == 320 && mScreenHeight == 480) {
             options.inSampleSize = calculateImageSize(options, IMG_MAX_SIZE_MDPI);
         } else {
             options.inSampleSize = calculateImageSize(options, IMG_MAX_SIZE);
         }
+        
         options.inJustDecodeBounds = false;
         Bitmap photoImg = BitmapFactory.decodeFile(path, options);
         mImageHeight = photoImg.getHeight();
         mImageWidth = photoImg.getWidth();
+        Log.d("Example", "After resize: " + mImageWidth + " " + mImageHeight);
         mImg.setImageBitmap(photoImg);
     }
-    
-    private File getOutputMediaFile(String filename) {
-        return new File(getOutputLink(filename));
-    }
 
-    private String getOutputLink(String filename) {
-        String directory = "";
-
-        // Check if storage is mounted.
-        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), APP_NAME);
-
-            // Create the storage directory if it does not exist
-            if (!mediaStorageDir.exists()) {
-                if (!mediaStorageDir.mkdirs()) {
-                    return null;
-                }
-            }
-            directory = mediaStorageDir.getPath() + File.separator + filename;
-        }
-        return directory;
-    }
-    
+    /*
+     * Retrieves the path to the selected image from the Gallery app.
+     */
     private String getGalleryImagePath(Intent data) {
         Uri imgUri = data.getData();
         String filePath = "";
@@ -156,13 +133,14 @@ public class CropActivity extends Activity implements OnTouchListener {
             int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
             filePath = cursor.getString(columnIndex);
             cursor.close();
-        } else if (data.getType().equals("image/jpeg") || data.getType().equals("image/png")) {
-            // For getting images from dropbox.
-            filePath = imgUri.getPath();
-        }
+        } 
         return filePath;
     }
     
+    /*
+     * Calculation used to determine by what factor images need to be reduced by.
+     * Images with its longest side below the threshold will not be resized.
+     */
     private int calculateImageSize(BitmapFactory.Options opts, int threshold) {
         int scaleFactor = 1;
         final int height = opts.outHeight;
@@ -173,38 +151,15 @@ public class CropActivity extends Activity implements OnTouchListener {
         } else {
             scaleFactor = Math.round((float) height / threshold);
         }
-
         return scaleFactor;
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        
+
         if (resultCode == RESULT_OK) {
-            if (requestCode == MEDIA_SELECT_DIALOG) {
-                String mediaSelected = data.getExtras().getString(SELECTED_MEDIA);
-                
-                if (mediaSelected.equals(MediaSelectDialog.CAMERA)) {
-                    File dir = getOutputMediaFile(TEMP_JPEG_FILENAME);
-                    if (dir == null) {
-                        // Signal user is external storage is not connected.
-                        Toast.makeText(this, STORAGE_MISSING_MSG, Toast.LENGTH_SHORT).show();
-                    } else {
-                        // Start Camera App.
-                        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(dir));
-                        startActivityForResult(cameraIntent, MEDIA_CAMERA);
-                    }
-                } else if (mediaSelected.equals(MediaSelectDialog.GALLERY)) {
-                    // Start Gallery App.
-                    Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    startActivityForResult(intent , MEDIA_GALLERY);
-                }
-            } else if (requestCode == MEDIA_CAMERA) {
-                String path = getOutputLink(TEMP_JPEG_FILENAME);
-                setSelectedImage(path);
-            } else if (requestCode == MEDIA_GALLERY) {
+            if (requestCode == MEDIA_GALLERY) {
                 String path = getGalleryImagePath(data);
                 setSelectedImage(path);
             }
