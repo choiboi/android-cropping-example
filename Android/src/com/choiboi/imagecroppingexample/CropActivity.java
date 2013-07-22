@@ -69,13 +69,22 @@ public class CropActivity extends Activity implements OnTouchListener {
         mScreenHeight = metrics.heightPixels;
         mScreenWidth = metrics.widthPixels;
         
+        // Set template image accordingly to device screen size.
+        if (mScreenWidth == 320 && mScreenHeight == 480) {
+            Bitmap faceTemplate = BitmapFactory.decodeResource(getResources(), R.drawable.face_oval);
+            faceTemplate = Bitmap.createScaledBitmap(faceTemplate, 218, 300, true);
+            mTemplateImg.setImageBitmap(faceTemplate);
+        }
+        
+        Bitmap photoImg = BitmapFactory.decodeResource(getResources(), R.drawable.temp_image);
+        mImg.setImageBitmap(photoImg);
+        mImageHeight = photoImg.getHeight();
+        mImageWidth = photoImg.getWidth();
+        
         // View is scaled by matrix, so scale initially
         mMatrix.postScale(mScaleFactor, mScaleFactor);
         mImg.setImageMatrix(mMatrix);
-
-        mImageHeight = 0;//photoImg.getHeight();
-        mImageWidth = 0;//photoImg.getWidth();
-
+        
         // Setup Gesture Detectors
         mScaleDetector = new ScaleGestureDetector(getApplicationContext(), new ScaleListener());
         mRotateDetector = new RotateGestureDetector(getApplicationContext(), new RotateListener());
