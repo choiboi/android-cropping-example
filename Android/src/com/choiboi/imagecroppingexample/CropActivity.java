@@ -7,21 +7,39 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.graphics.PointF;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.DisplayMetrics;
+import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-public class CropActivity extends Activity {
+import com.choiboi.imagecroppingexample.gestures.MoveGestureDetector;
+import com.choiboi.imagecroppingexample.gestures.RotateGestureDetector;
+
+public class CropActivity extends Activity implements OnTouchListener {
     
     private ImageView mImg;
     private ImageView mTemplateImg;
     private int mScreenWidth;
     private int mScreenHeight;
+    
+    private Matrix mMatrix = new Matrix();
+    private float mScaleFactor = 0.8f;
+    private float mRotationDegrees = 0.f;
+    private float mFocusX = 0.f;
+    private float mFocusY = 0.f;
+    private int mImageHeight, mImageWidth;
+    private ScaleGestureDetector mScaleDetector;
+    private RotateGestureDetector mRotateDetector;
+    private MoveGestureDetector mMoveDetector;
     
     // Constants
     private final String TEMP_JPEG_FILENAME = "img_temp.jpg";
@@ -43,12 +61,25 @@ public class CropActivity extends Activity {
         
         mImg = (ImageView) findViewById(R.id.cp_img);
         mTemplateImg = (ImageView) findViewById(R.id.cp_face_template);
+        mImg.setOnTouchListener(this);
         
         // Get screen size in pixels.
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         mScreenHeight = metrics.heightPixels;
         mScreenWidth = metrics.widthPixels;
+        
+        // View is scaled by matrix, so scale initially
+        mMatrix.postScale(mScaleFactor, mScaleFactor);
+        mImg.setImageMatrix(mMatrix);
+
+        mImageHeight = 0;//photoImg.getHeight();
+        mImageWidth = 0;//photoImg.getWidth();
+
+        // Setup Gesture Detectors
+        mScaleDetector = new ScaleGestureDetector(getApplicationContext(), new ScaleListener());
+        mRotateDetector = new RotateGestureDetector(getApplicationContext(), new RotateListener());
+        mMoveDetector = new MoveGestureDetector(getApplicationContext(), new MoveListener());
     }
     
     public void onCropImageButton(View v) {
@@ -78,6 +109,8 @@ public class CropActivity extends Activity {
         }
         options.inJustDecodeBounds = false;
         Bitmap photoImg = BitmapFactory.decodeFile(path, options);
+        mImageHeight = photoImg.getHeight();
+        mImageWidth = photoImg.getWidth();
         mImg.setImageBitmap(photoImg);
     }
     
@@ -166,6 +199,53 @@ public class CropActivity extends Activity {
                 String path = getGalleryImagePath(data);
                 setSelectedImage(path);
             }
+        }
+    }
+    
+    public boolean onTouch(View v, MotionEvent event) {
+        mScaleDetector.onTouchEvent(event);
+        mRotateDetector.onTouchEvent(event);
+        mMoveDetector.onTouchEvent(event);
+
+        float scaledImageCenterX = (mImageWidth * mScaleFactor) / 2;
+        float scaledImageCenterY = (mImageHeight * mScaleFactor) / 2;
+
+        mMatrix.reset();
+        mMatrix.postScale(mScaleFactor, mScaleFactor);
+        mMatrix.postRotate(mRotationDegrees, scaledImageCenterX, scaledImageCenterY);
+        mMatrix.postTranslate(mFocusX - scaledImageCenterX, mFocusY - scaledImageCenterY);
+
+        ImageView view = (ImageView) v;
+        view.setImageMatrix(mMatrix);
+        return true;
+    }
+    
+    private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+        @Override
+        public boolean onScale(ScaleGestureDetector detector) {
+            mScaleFactor *= detector.getScaleFactor();
+            mScaleFactor = Math.max(0.1f, Math.min(mScaleFactor, 10.0f));
+
+            return true;
+        }
+    }
+
+    private class RotateListener extends RotateGestureDetector.SimpleOnRotateGestureListener {
+        @Override
+        public boolean onRotate(RotateGestureDetector detector) {
+            mRotationDegrees -= detector.getRotationDegreesDelta();
+            return true;
+        }
+    }
+
+    private class MoveListener extends MoveGestureDetector.SimpleOnMoveGestureListener {
+        @Override
+        public boolean onMove(MoveGestureDetector detector) {
+            PointF d = detector.getFocusDelta();
+            mFocusX += d.x;
+            mFocusY += d.y;
+
+            return true;
         }
     }
 }
