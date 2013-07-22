@@ -17,6 +17,7 @@ import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.choiboi.imagecroppingexample.gestures.MoveGestureDetector;
 import com.choiboi.imagecroppingexample.gestures.RotateGestureDetector;
@@ -40,6 +41,7 @@ public class CropActivity extends Activity implements OnTouchListener {
     
     // Constants
     public static final int MEDIA_GALLERY = 1;
+    public static final int TEMPLATE_SELECTION = 2;
     
     private final static int IMG_MAX_SIZE = 1000;
     private final static int IMG_MAX_SIZE_MDPI = 400;
@@ -87,7 +89,8 @@ public class CropActivity extends Activity implements OnTouchListener {
     }
     
     public void onChangeTemplateButton(View v) {
-        
+        Intent intent = new Intent(this, TemplateSelectDialog.class);
+        startActivityForResult(intent, TEMPLATE_SELECTION);
     }
     
     public void onChangeImageButton(View v) {
@@ -162,6 +165,9 @@ public class CropActivity extends Activity implements OnTouchListener {
             if (requestCode == MEDIA_GALLERY) {
                 String path = getGalleryImagePath(data);
                 setSelectedImage(path);
+            } else if (requestCode == TEMPLATE_SELECTION) {
+                int pos = data.getExtras().getInt(TemplateSelectDialog.POSITION);
+                Toast.makeText(this, "" + pos, Toast.LENGTH_SHORT).show();
             }
         }
     }

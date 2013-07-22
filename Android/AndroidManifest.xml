@@ -43,9 +43,9 @@
         </activity>
         
         <activity
-            android:name=".MediaSelectDialog"
+            android:name=".TemplateSelectDialog"
             android:configChanges="keyboardHidden"
-            android:label="@string/msd_select_media_text" 
+            android:label="@string/sd_select_template_text" 
             android:theme="@android:style/Theme.Dialog"
             android:screenOrientation="portrait">
         </activity>
