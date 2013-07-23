@@ -76,7 +76,8 @@ public class ImageProcess {
                 x2++;
             }
 
-            // Exit loop once we reached top most part of the template line.
+            // Once we reach the top-most part on the template line, set pixel value transparent
+            // from that point on.
             int px = bm.getPixel(wMid, y);
             if (Color.red(px) == 234 && Color.green(px) == 157 && Color.blue(px) == 33) {
                 for (int y3 = y2; y3 >= 0; y3--) {
@@ -133,7 +134,8 @@ public class ImageProcess {
                 x2++;
             }
 
-            // Exit loop once we reached bottom most part of the template line.
+            // Once we reach the bottom-most part on the template line, set pixel value transparent
+            // from that point on.
             int px = bm.getPixel(wMid, y);
             if (Color.red(px) == 234 && Color.green(px) == 157 && Color.blue(px) == 33) {
                 for (int y3 = y2; y3 < finalBm.getHeight(); y3++) {

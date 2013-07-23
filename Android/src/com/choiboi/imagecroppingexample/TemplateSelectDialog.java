@@ -54,6 +54,7 @@ public class TemplateSelectDialog extends Activity {
         });
     }
     
+    // Adapter that will setup the layout of each line in ListView.
     private class FaceTemplateListViewAdapter extends BaseAdapter {
         private Context mmContext;
         private String[] mmTypes;

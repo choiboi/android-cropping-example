@@ -19,7 +19,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
@@ -31,6 +30,7 @@ import com.choiboi.imagecroppingexample.gestures.RotateGestureDetector;
 
 public class CropActivity extends Activity implements OnTouchListener {
     
+    // Member fields.
     private ImageView mImg;
     private ImageView mTemplateImg;
     private int mScreenWidth;
@@ -93,6 +93,7 @@ public class CropActivity extends Activity implements OnTouchListener {
         mRotateDetector = new RotateGestureDetector(getApplicationContext(), new RotateListener());
         mMoveDetector = new MoveGestureDetector(getApplicationContext(), new MoveListener());
         
+        // Instantiate Thread Handler.
         mCropHandler = new CropHandler(this);
     }
     
@@ -104,7 +105,8 @@ public class CropActivity extends Activity implements OnTouchListener {
         mProgressDialog.setMessage("Cropping Image\nPlease Wait.....");
         mProgressDialog.show();
 
-        // Get both images from ImageView.
+        // Setting values so that we can retrive the image from 
+        // ImageView multiple times.
         mImg.buildDrawingCache(true);
         mImg.setDrawingCacheEnabled(true);
         mTemplateImg.buildDrawingCache(true);
@@ -123,6 +125,8 @@ public class CropActivity extends Activity implements OnTouchListener {
                 }
                 mImg.setDrawingCacheEnabled(false);
                 mTemplateImg.setDrawingCacheEnabled(false);
+                
+                // Send a message to the Handler indicating the Thread has finished.
                 mCropHandler.obtainMessage(DISPLAY_IMAGE, -1, -1, croppedImg).sendToTarget();
             }
         }).start();
@@ -147,7 +151,6 @@ public class CropActivity extends Activity implements OnTouchListener {
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(path, options);
-        Log.d("Example", "After resize: " + options.outWidth + " " + options.outHeight);
         if (mScreenWidth == 320 && mScreenHeight == 480) {
             options.inSampleSize = calculateImageSize(options, IMG_MAX_SIZE_MDPI);
         } else {
@@ -158,7 +161,6 @@ public class CropActivity extends Activity implements OnTouchListener {
         Bitmap photoImg = BitmapFactory.decodeFile(path, options);
         mImageHeight = photoImg.getHeight();
         mImageWidth = photoImg.getWidth();
-        Log.d("Example", "After resize: " + mImageWidth + " " + mImageHeight);
         mImg.setImageBitmap(photoImg);
     }
 
@@ -209,6 +211,7 @@ public class CropActivity extends Activity implements OnTouchListener {
                 int pos = data.getExtras().getInt(TemplateSelectDialog.POSITION);
                 Bitmap templateImg = null;
                 
+                // Change template according to what the user has selected.
                 switch(pos) {
                 case 0:
                     templateImg = BitmapFactory.decodeResource(getResources(), R.drawable.face_oblong);
@@ -227,6 +230,7 @@ public class CropActivity extends Activity implements OnTouchListener {
                     break;
                 }
                 
+                // Resize template if necessary.
                 if (mScreenWidth == 320 && mScreenHeight == 480) {
                     templateImg = Bitmap.createScaledBitmap(templateImg, 218, 300, true);
                 }
@@ -251,10 +255,10 @@ public class CropActivity extends Activity implements OnTouchListener {
                 mProgressDialog.dismiss();
                 Bitmap cropImg = (Bitmap) msg.obj;
                 
+                // Setup an AlertDialog to display cropped image.
                 AlertDialog.Builder builder = new AlertDialog.Builder(ca);
                 builder.setTitle("Final Cropped Image");
                 builder.setIcon(new BitmapDrawable(ca.getResources(), cropImg));
-
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                       public void onClick(DialogInterface dialog, int id) {
                           dialog.cancel();
