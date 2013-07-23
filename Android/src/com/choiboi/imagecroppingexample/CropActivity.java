@@ -17,7 +17,6 @@ import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.choiboi.imagecroppingexample.gestures.MoveGestureDetector;
 import com.choiboi.imagecroppingexample.gestures.RotateGestureDetector;
@@ -167,7 +166,30 @@ public class CropActivity extends Activity implements OnTouchListener {
                 setSelectedImage(path);
             } else if (requestCode == TEMPLATE_SELECTION) {
                 int pos = data.getExtras().getInt(TemplateSelectDialog.POSITION);
-                Toast.makeText(this, "" + pos, Toast.LENGTH_SHORT).show();
+                Bitmap templateImg = null;
+                
+                switch(pos) {
+                case 0:
+                    templateImg = BitmapFactory.decodeResource(getResources(), R.drawable.face_oblong);
+                    break;
+                case 1:
+                    templateImg = BitmapFactory.decodeResource(getResources(), R.drawable.face_oval);
+                    break;
+                case 2:
+                    templateImg = BitmapFactory.decodeResource(getResources(), R.drawable.face_round);
+                    break;
+                case 3:
+                    templateImg = BitmapFactory.decodeResource(getResources(), R.drawable.face_square);
+                    break;
+                case 4:
+                    templateImg = BitmapFactory.decodeResource(getResources(), R.drawable.face_triangular);
+                    break;
+                }
+                
+                if (mScreenWidth == 320 && mScreenHeight == 480) {
+                    templateImg = Bitmap.createScaledBitmap(templateImg, 218, 300, true);
+                }
+                mTemplateImg.setImageBitmap(templateImg);
             }
         }
     }
