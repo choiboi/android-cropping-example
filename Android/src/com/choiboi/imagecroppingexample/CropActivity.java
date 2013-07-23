@@ -3,13 +3,16 @@ package com.choiboi.imagecroppingexample;
 import java.lang.ref.WeakReference;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.PointF;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -102,21 +105,24 @@ public class CropActivity extends Activity implements OnTouchListener {
         mProgressDialog.show();
 
         // Get both images from ImageView.
-        mImg.buildDrawingCache();
-        final Bitmap img = mImg.getDrawingCache();
-        mTemplateImg.buildDrawingCache();
-        final Bitmap tempImg = mTemplateImg.getDrawingCache();
+        mImg.buildDrawingCache(true);
+        mImg.setDrawingCacheEnabled(true);
+        mTemplateImg.buildDrawingCache(true);
+        mTemplateImg.setDrawingCacheEnabled(true);
         
         // Create new thread to crop.
         new Thread(new Runnable() {
             @Override
             public void run() {
+                // Crop image using the correct template size.
                 Bitmap croppedImg = null;
                 if (mScreenWidth == 320 && mScreenHeight == 480) {
-                    croppedImg = ImageProcess.cropImage(img, tempImg, 218, 300);
+                    croppedImg = ImageProcess.cropImage(mImg.getDrawingCache(true), mTemplateImg.getDrawingCache(true), 218, 300);
                 } else {
-                    croppedImg = ImageProcess.cropImage(img, tempImg, 320, 440);
+                    croppedImg = ImageProcess.cropImage(mImg.getDrawingCache(true), mTemplateImg.getDrawingCache(true), 320, 440);
                 }
+                mImg.setDrawingCacheEnabled(false);
+                mTemplateImg.setDrawingCacheEnabled(false);
                 mCropHandler.obtainMessage(DISPLAY_IMAGE, -1, -1, croppedImg).sendToTarget();
             }
         }).start();
@@ -229,6 +235,38 @@ public class CropActivity extends Activity implements OnTouchListener {
         }
     }
     
+    private static class CropHandler extends Handler {
+        WeakReference<CropActivity> mThisCA;
+        
+        CropHandler(CropActivity ca) {
+            mThisCA = new WeakReference<CropActivity>(ca);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            
+            CropActivity ca = mThisCA.get();
+            if (msg.what == DISPLAY_IMAGE) {
+                mProgressDialog.dismiss();
+                Bitmap cropImg = (Bitmap) msg.obj;
+                
+                AlertDialog.Builder builder = new AlertDialog.Builder(ca);
+                builder.setTitle("Final Cropped Image");
+                builder.setIcon(new BitmapDrawable(ca.getResources(), cropImg));
+
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                      public void onClick(DialogInterface dialog, int id) {
+                          dialog.cancel();
+                      }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        }
+    }
+    
+    
     public boolean onTouch(View v, MotionEvent event) {
         mScaleDetector.onTouchEvent(event);
         mRotateDetector.onTouchEvent(event);
@@ -245,25 +283,6 @@ public class CropActivity extends Activity implements OnTouchListener {
         ImageView view = (ImageView) v;
         view.setImageMatrix(mMatrix);
         return true;
-    }
-    
-    private static class CropHandler extends Handler {
-        WeakReference<CropActivity> mThisCA;
-        
-        CropHandler(CropActivity ca) {
-            mThisCA = new WeakReference<CropActivity>(ca);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            
-            CropActivity ca = mThisCA.get();
-            if (msg.what == DISPLAY_IMAGE) {
-                mProgressDialog.dismiss();
-                Bitmap cropImg = (Bitmap) msg.obj;
-            }
-        }
     }
     
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
