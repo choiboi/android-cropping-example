@@ -148,10 +148,6 @@ public class ImageProcess {
             y2++;
         }
         
-        // Remove finished bitmaps to free up memory.
-        bm.recycle();
-        img.recycle();
-        templateImage.recycle();
         return finalBm;
     }
 }
