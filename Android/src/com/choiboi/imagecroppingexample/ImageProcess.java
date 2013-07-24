@@ -150,6 +150,10 @@ public class ImageProcess {
             y2++;
         }
         
+        // Get rid of images that we finished with to save memory.
+        img.recycle();
+        templateImage.recycle();
+        bm.recycle();
         return finalBm;
     }
 }
