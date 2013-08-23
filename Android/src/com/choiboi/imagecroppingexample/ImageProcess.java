@@ -157,6 +157,19 @@ public class ImageProcess {
         return finalBm;
     }
     
+    /*
+     * This method gets the image inside the template area and returns that bitmap.
+     * Process of how this method works:
+     *     1) Combine img and templateImage together with templateImage being on the top.
+     *     2) Create a new blank bitmap using the given width and height, which is the 
+     *        size of the template on the screen.
+     *     3) Starting in the center go through the image quadrant by quadrant copying 
+     *        the pixel value onto the new blank bitmap.
+     *     4) Once it hits the pixel colour values of the template lines exit out of the loop.
+     *        (Because there is no point in setting transparent pixel values to pixels that are
+     *        already transparent.)
+     *     5) Return the cropped bitmap.
+     */
     public static Bitmap cropImageVer2(Bitmap img, Bitmap templateImage, int width, int height) {
         // Merge two images together.
         Bitmap bm = Bitmap.createBitmap(img.getWidth(), img.getHeight(), Bitmap.Config.ARGB_8888);
@@ -166,8 +179,6 @@ public class ImageProcess {
         
         // Create new blank ARGB bitmap.
         Bitmap finalBm = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        Canvas finalBmCanvas = new Canvas(finalBm);
-        finalBmCanvas.drawColor(Color.TRANSPARENT);
         
         // Get the coordinates for the middle of bm.
         int hMid = bm.getHeight() / 2;
@@ -186,6 +197,7 @@ public class ImageProcess {
                 }
 
                 int px = bm.getPixel(x, y);
+                // Get out of loop once it hits the left side of the template.
                 if (Color.red(px) == 234 && Color.green(px) == 157 && Color.blue(px) == 33) {
                     break;
                 } else {
@@ -202,6 +214,7 @@ public class ImageProcess {
                 }
 
                 int px = bm.getPixel(x, y);
+                // Get out of loop once it hits the right side of the template.
                 if (Color.red(px) == 234 && Color.green(px) == 157 && Color.blue(px) == 33) {
                     break;
                 } else {
@@ -210,6 +223,7 @@ public class ImageProcess {
                 x2++;
             }
             
+            // Get out of loop once it hits top most part of the template.
             int px = bm.getPixel(wMid, y);
             if (Color.red(px) == 234 && Color.green(px) == 157 && Color.blue(px) == 33) {
                 break;
@@ -228,6 +242,7 @@ public class ImageProcess {
                 }
 
                 int px = bm.getPixel(x, y);
+                // Get out of loop once it hits the left side of the template.
                 if (Color.red(px) == 234 && Color.green(px) == 157 && Color.blue(px) == 33) {
                     break;
                 } else {
@@ -242,8 +257,9 @@ public class ImageProcess {
                 if (x2 >= finalBm.getWidth()) {
                     break;
                 }
-
+                
                 int px = bm.getPixel(x, y);
+                // Get out of loop once it hits the right side of the template.
                 if (Color.red(px) == 234 && Color.green(px) == 157 && Color.blue(px) == 33) {
                     break;
                 } else {
@@ -252,11 +268,11 @@ public class ImageProcess {
                 x2++;
             }
             
+            // Get out of loop once it hits bottom most part of the template.
             int px = bm.getPixel(wMid, y);
             if (Color.red(px) == 234 && Color.green(px) == 157 && Color.blue(px) == 33) {
                 break;
             } 
-            
             x2 = wfMid;
             y2++;
         }

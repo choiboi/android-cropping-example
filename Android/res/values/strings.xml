@@ -4,7 +4,8 @@
     <string name="app_name">Image Cropping Example</string>
     
     <!-- Main Page -->
-    <string name="ma_start_crop_button">Start Crop Image</string>
+    <string name="ma_crop_ver1_button">Start Crop Algorithm Version 1</string>
+    <string name="ma_crop_ver2_button">Start Crop Algorithm Version 2</string>
     <string name="ma_info_text">Click on button below to start cropping image.</string>
     
     <!-- Crop Page -->

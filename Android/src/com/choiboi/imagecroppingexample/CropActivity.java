@@ -37,6 +37,7 @@ public class CropActivity extends Activity implements OnTouchListener {
     private int mScreenHeight;
     private CropHandler mCropHandler;
     private static ProgressDialog mProgressDialog;
+    private int mSelectedVersion;
     
     private Matrix mMatrix = new Matrix();
     private float mScaleFactor = 0.8f;
@@ -60,6 +61,8 @@ public class CropActivity extends Activity implements OnTouchListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_crop);
+        
+        mSelectedVersion = getIntent().getExtras().getInt(MainActivity.CROP_VERSION_SELECTED_KEY, -1);
         
         mImg = (ImageView) findViewById(R.id.cp_img);
         mTemplateImg = (ImageView) findViewById(R.id.cp_face_template);
@@ -119,9 +122,17 @@ public class CropActivity extends Activity implements OnTouchListener {
                 // Crop image using the correct template size.
                 Bitmap croppedImg = null;
                 if (mScreenWidth == 320 && mScreenHeight == 480) {
-                    croppedImg = ImageProcess.cropImage(mImg.getDrawingCache(true), mTemplateImg.getDrawingCache(true), 218, 300);
+                    if (mSelectedVersion == MainActivity.VERSION_1) {
+                        croppedImg = ImageProcess.cropImage(mImg.getDrawingCache(true), mTemplateImg.getDrawingCache(true), 218, 300);
+                    } else {
+                        croppedImg = ImageProcess.cropImageVer2(mImg.getDrawingCache(true), mTemplateImg.getDrawingCache(true), 218, 300);
+                    }
                 } else {
-                    croppedImg = ImageProcess.cropImage(mImg.getDrawingCache(true), mTemplateImg.getDrawingCache(true), 320, 440);
+                    if (mSelectedVersion == MainActivity.VERSION_1) {
+                        croppedImg = ImageProcess.cropImage(mImg.getDrawingCache(true), mTemplateImg.getDrawingCache(true), 320, 440);
+                    } else {
+                        croppedImg = ImageProcess.cropImageVer2(mImg.getDrawingCache(true), mTemplateImg.getDrawingCache(true), 320, 440);
+                    }
                 }
                 mImg.setDrawingCacheEnabled(false);
                 mTemplateImg.setDrawingCacheEnabled(false);
