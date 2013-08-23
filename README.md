@@ -13,6 +13,11 @@ There are many image cropping tools that can be implemented in Android, but the 
  5. Select the "Android" folder and click "Open"
  6. Select "Finish" and the project should appear in your "Package Explorer"
 
+####Screenshots
+![ScreenShot](https://raw.github.com/choiboi/android-cropping-example/master/others/Screenshot1.png)
+![ScreenShot](https://raw.github.com/choiboi/android-cropping-example/master/others/Screenshot2.png)
+![ScreenShot](https://raw.github.com/choiboi/android-cropping-example/master/others/Screenshot3.png)
+
 License
 -------
 ```
