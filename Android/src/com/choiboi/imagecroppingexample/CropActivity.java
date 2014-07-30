@@ -49,6 +49,9 @@ public class CropActivity extends Activity implements OnTouchListener {
     private RotateGestureDetector mRotateDetector;
     private MoveGestureDetector mMoveDetector;
     
+    private int mTemplateWidth;
+    private int mTemplateHeight;
+    
     // Constants
     public static final int MEDIA_GALLERY = 1;
     public static final int TEMPLATE_SELECTION = 2;
@@ -74,10 +77,15 @@ public class CropActivity extends Activity implements OnTouchListener {
         mScreenHeight = metrics.heightPixels;
         mScreenWidth = metrics.widthPixels;
         
+        Bitmap faceTemplate = BitmapFactory.decodeResource(getResources(), R.drawable.face_oval);
+        mTemplateWidth = faceTemplate.getWidth();
+        mTemplateHeight = faceTemplate.getHeight();
+        
         // Set template image accordingly to device screen size.
         if (mScreenWidth == 320 && mScreenHeight == 480) {
-            Bitmap faceTemplate = BitmapFactory.decodeResource(getResources(), R.drawable.face_oval);
-            faceTemplate = Bitmap.createScaledBitmap(faceTemplate, 218, 300, true);
+            mTemplateWidth = 218;
+            mTemplateHeight = 300;
+            faceTemplate = Bitmap.createScaledBitmap(faceTemplate, mTemplateWidth, mTemplateHeight, true);
             mTemplateImg.setImageBitmap(faceTemplate);
         }
         
@@ -123,15 +131,15 @@ public class CropActivity extends Activity implements OnTouchListener {
                 Bitmap croppedImg = null;
                 if (mScreenWidth == 320 && mScreenHeight == 480) {
                     if (mSelectedVersion == MainActivity.VERSION_1) {
-                        croppedImg = ImageProcess.cropImage(mImg.getDrawingCache(true), mTemplateImg.getDrawingCache(true), 218, 300);
+                        croppedImg = ImageProcess.cropImage(mImg.getDrawingCache(true), mTemplateImg.getDrawingCache(true), mTemplateWidth, mTemplateHeight);
                     } else {
-                        croppedImg = ImageProcess.cropImageVer2(mImg.getDrawingCache(true), mTemplateImg.getDrawingCache(true), 218, 300);
+                        croppedImg = ImageProcess.cropImageVer2(mImg.getDrawingCache(true), mTemplateImg.getDrawingCache(true), mTemplateWidth, mTemplateHeight);
                     }
                 } else {
                     if (mSelectedVersion == MainActivity.VERSION_1) {
-                        croppedImg = ImageProcess.cropImage(mImg.getDrawingCache(true), mTemplateImg.getDrawingCache(true), 320, 440);
+                        croppedImg = ImageProcess.cropImage(mImg.getDrawingCache(true), mTemplateImg.getDrawingCache(true), mTemplateWidth, mTemplateHeight);
                     } else {
-                        croppedImg = ImageProcess.cropImageVer2(mImg.getDrawingCache(true), mTemplateImg.getDrawingCache(true), 320, 440);
+                        croppedImg = ImageProcess.cropImageVer2(mImg.getDrawingCache(true), mTemplateImg.getDrawingCache(true), mTemplateWidth, mTemplateHeight);
                     }
                 }
                 mImg.setDrawingCacheEnabled(false);
@@ -241,9 +249,14 @@ public class CropActivity extends Activity implements OnTouchListener {
                     break;
                 }
                 
+                mTemplateWidth = templateImg.getWidth();
+                mTemplateHeight = templateImg.getHeight();
+                
                 // Resize template if necessary.
                 if (mScreenWidth == 320 && mScreenHeight == 480) {
-                    templateImg = Bitmap.createScaledBitmap(templateImg, 218, 300, true);
+                    mTemplateWidth = 218;
+                    mTemplateHeight = 300;
+                    templateImg = Bitmap.createScaledBitmap(templateImg, mTemplateWidth, mTemplateHeight, true);
                 }
                 mTemplateImg.setImageBitmap(templateImg);
             }
