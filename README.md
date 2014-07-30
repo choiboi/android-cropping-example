@@ -5,7 +5,7 @@ Introduction
 ------------
 There are many image cropping tools that can be implemented in Android, but the only problem is that they only crop out square or rectangular parts on an image. So, this example will show my implementation of an image cropping tool where it crops out non-rectangular images.
 
-Link to blog: (Android Image Cropping Example)[http://choiboijames.blogspot.ca/2013/07/android-image-cropping-example.html]
+Link to blog: [Android Image Cropping Example](http://choiboijames.blogspot.ca/2013/07/android-image-cropping-example.html)
 
 ####Import into Eclipse/ADT(Android Development Tool)
  1. File --> Import
