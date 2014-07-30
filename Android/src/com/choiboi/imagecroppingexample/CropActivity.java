@@ -76,7 +76,7 @@ public class CropActivity extends Activity implements OnTouchListener {
         
         // Set template image accordingly to device screen size.
         if (mScreenWidth == 320 && mScreenHeight == 480) {
-            Bitmap faceTemplate = BitmapFactory.decodeResource(getResources(), R.drawable.face_oval);
+            Bitmap faceTemplate = BitmapFactory.decodeResource(getResources(), R.drawable.large_template);
             faceTemplate = Bitmap.createScaledBitmap(faceTemplate, 218, 300, true);
             mTemplateImg.setImageBitmap(faceTemplate);
         }
@@ -128,10 +128,11 @@ public class CropActivity extends Activity implements OnTouchListener {
                         croppedImg = ImageProcess.cropImageVer2(mImg.getDrawingCache(true), mTemplateImg.getDrawingCache(true), 218, 300);
                     }
                 } else {
+                    // TODO: Change template size.
                     if (mSelectedVersion == MainActivity.VERSION_1) {
-                        croppedImg = ImageProcess.cropImage(mImg.getDrawingCache(true), mTemplateImg.getDrawingCache(true), 320, 440);
+                        croppedImg = ImageProcess.cropImage(mImg.getDrawingCache(true), mTemplateImg.getDrawingCache(true), 650, 894);
                     } else {
-                        croppedImg = ImageProcess.cropImageVer2(mImg.getDrawingCache(true), mTemplateImg.getDrawingCache(true), 320, 440);
+                        croppedImg = ImageProcess.cropImageVer2(mImg.getDrawingCache(true), mTemplateImg.getDrawingCache(true), 650, 894);
                     }
                 }
                 mImg.setDrawingCacheEnabled(false);
