@@ -3,7 +3,6 @@ package com.choiboi.imagecroppingexample;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.util.Log;
 
 public class ImageProcess {
     
@@ -198,7 +197,6 @@ public class ImageProcess {
                 }
 
                 int px = bm.getPixel(x, y);
-                Log.d("TAG", "x: " + x + " y: " + y);
                 // Get out of loop once it hits the left side of the template.
                 if (Color.red(px) == 234 && Color.green(px) == 157 && Color.blue(px) == 33) {
                     break;

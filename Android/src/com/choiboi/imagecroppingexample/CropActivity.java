@@ -19,6 +19,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
@@ -266,6 +267,7 @@ public class CropActivity extends Activity implements OnTouchListener {
             if (msg.what == DISPLAY_IMAGE) {
                 mProgressDialog.dismiss();
                 Bitmap cropImg = (Bitmap) msg.obj;
+                Log.d("TAG", "final image size x: " + cropImg.getWidth() + " y: " + cropImg.getHeight());
                 
                 // Setup an AlertDialog to display cropped image.
                 AlertDialog.Builder builder = new AlertDialog.Builder(ca);
