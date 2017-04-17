@@ -1,7 +1,7 @@
 Android Image Cropping Example
 ==============================
 
-###This project is currently NOT BEING MAINTAINED. 
+### This project is currently NOT BEING MAINTAINED. 
 
 Introduction
 ------------
@@ -10,7 +10,7 @@ There are many image cropping tools that can be implemented in Android, but the 
 Link to blog: [Android Image Cropping Example](http://choiboijames.blogspot.ca/2013/07/android-image-cropping-example.html)  
 Link to blog: [Changing Template Instructions](http://choiboijames.blogspot.ca/2014/09/android-image-cropping-changing.html)  
 
-####Import into Eclipse/ADT(Android Development Tool)
+#### Import into Eclipse/ADT(Android Development Tool)
  1. File --> Import
  2. Select "Existing Android Code Into Workspace" and click "Next"
  3. Click on "Browse" on the top right
@@ -18,7 +18,7 @@ Link to blog: [Changing Template Instructions](http://choiboijames.blogspot.ca/2
  5. Select the "Android" folder and click "Open"
  6. Select "Finish" and the project should appear in your "Package Explorer"
 
-####Screenshots
+#### Screenshots
 ![ScreenShot](https://raw.github.com/choiboi/android-cropping-example/master/others/Screenshot1.png)
 ![ScreenShot](https://raw.github.com/choiboi/android-cropping-example/master/others/Screenshot2.png)
 ![ScreenShot](https://raw.github.com/choiboi/android-cropping-example/master/others/Screenshot3.png)
