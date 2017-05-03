@@ -1,7 +1,7 @@
 Android Image Cropping Example
 ==============================
 
-### This project is currently NOT BEING MAINTAINED. No SUPPORT is provided.
+### This project is currently NOT BEING MAINTAINED. No SUPPORT is provided. Use at your own RISK.
 
 Introduction
 ------------
